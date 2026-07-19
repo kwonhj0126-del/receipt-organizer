@@ -2,28 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>SITE_URL/</loc>
+    <loc>https://receipt-organizer-p8sm.vercel.app/</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>SITE_URL/about.html</loc>
+    <loc>https://receipt-organizer-p8sm.vercel.app/about.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>SITE_URL/privacy.html</loc>
+    <loc>https://receipt-organizer-p8sm.vercel.app/privacy.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>SITE_URL/terms.html</loc>
+    <loc>https://receipt-organizer-p8sm.vercel.app/terms.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
