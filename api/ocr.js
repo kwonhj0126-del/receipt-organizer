@@ -4,7 +4,12 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { image, mediaType } = req.body;
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) { return res.status(400).json({ error: 'Invalid JSON' }); }
+  }
+  if (!body) return res.status(400).json({ error: 'body가 없습니다.' });
+  const { image, mediaType } = body;
   if (!image || !mediaType) {
     return res.status(400).json({ error: 'image와 mediaType이 필요합니다.' });
   }
@@ -26,14 +31,8 @@ module.exports = async function handler(req, res) {
         messages: [{
           role: 'user',
           content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mediaType, data: image }
-            },
-            {
-              type: 'text',
-              text: '이 영수증 이미지에서 다음 정보를 추출해줘. 반드시 아래 JSON 형식으로만 응답해. 다른 말은 하지 마.\n\n{\n  "date": "YYYY-MM-DD 형식 날짜, 없으면 빈 문자열",\n  "vendor": "가게명 또는 상호명, 없으면 빈 문자열",\n  "amount": 최종 결제 금액 숫자만,\n  "category": "식비/교통/사무용품/숙박/접대비/기타 중 하나"\n}'
-            }
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
+            { type: 'text', text: '이 영수증 이미지에서 다음 정보를 추출해줘. 반드시 아래 JSON 형식으로만 응답해. 다른 말은 하지 마.\n\n{\n  "date": "YYYY-MM-DD 형식 날짜, 없으면 빈 문자열",\n  "vendor": "가게명 또는 상호명, 없으면 빈 문자열",\n  "amount": 최종 결제 금액 숫자만 (합계/총액/결제금액 기준, 숫자만, 없으면 0),\n  "category": "식비/교통/사무용품/숙박/접대비/기타 중 하나"\n}' }
           ]
         }]
       })
@@ -53,7 +52,7 @@ module.exports = async function handler(req, res) {
       category: parsed.category || '기타'
     });
   } catch (err) {
-    console.error('OCR 오류:', err);
-    return res.status(500).json({ error: '인식 중 오류가 발생했습니다.' });
+    console.error('OCR 오류:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 }
