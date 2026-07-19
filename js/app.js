@@ -85,13 +85,32 @@ function handleFiles(files) {
 // ------------------------------------------------------------------
 // OCR — Claude API 호출 (/api/ocr 서버리스 함수 경유)
 // ------------------------------------------------------------------
+function compressImage(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1024;
+      let { width, height } = img;
+      if (width > MAX || height > MAX) {
+        if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+        else { width = Math.round(width * MAX / height); height = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = dataUrl;
+  });
+}
 async function runOcr(receipt) {
   receipt.status = 'processing';
   render();
   try {
     // base64에서 헤더(data:image/jpeg;base64,) 제거
-    const [meta, base64Data] = receipt.thumbnail.split(',');
-    const mediaType = meta.match(/:(.*?);/)?.[1] || 'image/jpeg';
+    const compressed = await compressImage(receipt.thumbnail);
+    const [meta, base64Data] = compressed.split(',');
+    const mediaType = 'image/jpeg';
 
     const res = await fetch('/api/ocr', {
       method: 'POST',
